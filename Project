@@ -1,0 +1,200 @@
+create database project1;
+show databases;
+select * from sham.employee_salary;
+RENAME TABLE sham.employee_salary TO sham.employee;
+select * from sham.employee;
+select name,bonus from sham.employee where bonus > 5000;
+select name from sham.employee where name like "A%";
+select * from sham.employee where name like "%A%";
+select distinct(Job_Role) as jobs from sham.employee;
+select * from sham.employee order by bonus desc;
+select* from sham.employee order by bonus asc;
+select concat(name,"_",place) as con from sham.employee;
+select right(name,4) as rt from sham.employee;
+select left(name,3) as lt from sham.employee;
+select pow(3,2) as po from sham.employee;
+select sqrt(bonus) as sqt from sham.employee;
+select count(*) as con from sham.employee;
+select * from sham.performance;
+select * from sham.performance as per;
+select * from sham.employee as emp;
+select emp.Emp_ID,emp.salary,emp.Job_Role from sham.employee emp inner join sham.performance per on emp.Emp_ID=per.Emp_ID;
+select emp.Emp_ID,emp.salary,emp.Job_Role,per.Performance_Rating from sham.employee emp right join sham.performance per on emp.Emp_ID=per.Emp_ID;
+select 	Name,Salary,
+           case when Salary  < 50000 then 5000
+                when Salary  > 50000 then 10000
+                else 0
+            end as Bonus
+from sham.employee;            
+select * from sham.employee;
+select* from sham.performance;
+/*If we want display the names, job_roles, and salaries of employees in department 10 in
+order based on their salary (from lowest to highest). You want to return the following
+result set*/
+select Name,Job_Role,Salary from sham.employee where Job_Role="Data Analyst" order by  salary asc ;
+
+/*If we want display the names, job_roles, and salaries of employees in department 10 in
+order based on their salary (highest to lowest). You want to return the following
+result set*/
+select Name,Job_Role,Salary from sham.employee where Job_Role="HR Manager" order by  salary desc ;
+
+select Emp_ID,Salary from sham.employee
+union all
+select Emp_ID,Department from sham.performance;
+
+select Emp_ID,Salary from sham.employee
+union 
+select Emp_ID,Department from sham.performance;
+select * from sham.employee;
+select * from sham.performance;
+/*Find employees who earn more than average salary.*/
+select name,salary from sham.employee where salary > (select avg(salary) as average from sham.employee ); 
+/*Find employees who work in the job_role as a financial analyst*/
+SELECT name
+FROM sham.employee
+WHERE Emp_ID IN (
+    SELECT Emp_ID
+    FROM sham.performance
+    WHERE Job_Role='Financial Analyst'
+);
+/*Use the window function ROW_NUMBER OVER to impose order, and specify the
+window of records that you want returned in your WHERE clause. For example, use
+this to return rows 1 through 5*/
+select salary from(select row_number() over (order by salary) as rn,salary from sham.employee) x where rn between 1 and 5;
+select salary from(select dense_rank() over (order by salary desc) as dr,salary from sham.employee) x where dr <=5;
+select dense_rank() over (order by salary) as dr,salary from sham.employee;
+select row_number() over (order by salary asc) as rn from sham.employee;
+select rank() over (order by salary asc) as rn from sham.employee;
+select * from sham.employee;
+select *from sham.performance;
+/* 1. who are the top 5 highest-paid employees*/
+select name,salary from sham.employee order by salary desc limit 5; 
+
+
+/* 2.which employees earn more than the company average salary*/
+select name,salary from sham.employee where salary >(select avg(salary) as sal from sham.employee);
+
+
+/* 3.what is the average salary for each job role*/
+select Job_Role,avg(salary)  as  avg_salary 
+from sham.employee 
+group by Job_Role;
+
+/* 4.which employee has the second highest salary*/
+select name,salary 
+from sham.employee
+ order by salary desc 
+ limit 1 offset 1;
+
+/*5.which department has the highest average performance rating*/
+select Job_Role,avg(performance_Rating) as avg_PR 
+from sham.performance 
+group by Job_Role 
+order by avg_PR desc;
+
+/* 6.list employees with performance rating equals to 5*/
+select Emp_ID,Performance_Rating from sham.performance where Performance_Rating = 5;
+
+
+select * from sham.performance;
+select * from sham.employee;
+select * from sham.employee as e;
+select * from sham.performance as p;
+/* 7.which employees have more than 5 years of experience*/
+select Emp_ID,Experience_Years
+ from sham.performance
+ where Experience_Years > 5;
+
+/*8.show employee name,job_role and salary*/
+select e.Name,p.Job_Role,e.Salary 
+from sham.employee e 
+right join sham.performance p
+ on e.Emp_ID=p.Emp_ID;
+
+/* 9.find employees working in the IT department*/
+select e.Name,P.Department 
+from sham.employee e
+ join sham.performance p
+ on e.Emp_ID = p.Emp_ID
+ where P.Department = "IT";
+
+
+/* 10.which department pays the highest salary*/
+select p.Department,max(e.Salary) as max_salary
+ from sham.employee e
+ join sham.performance p 
+ on e.Emp_ID=p.Emp_ID 
+ group by p.Department 
+ order by max_salary desc;
+ 
+ 
+ /*11.rank employees by salary*/
+ select name,salary ,rank( )  over (order by salary desc) as salary_rank from sham.employee;
+ 
+ 
+ /* 12.top employee in each department*/
+select * from 
+( select e.name,e.salary,p.department,row_number() over(partition by p.department order by e.salary desc) as rn
+ from sham.employee e
+ join sham.performance p
+ on e.Emp_ID=p.Emp_ID ) x
+ where rn=1;
+ 
+ /* 13.which department has the most experienced employees*/
+ select department,max(Experience_Years) as max_exp 
+ from sham.performance 
+ group by Department ;	
+ 
+ /* 14.average experience by department*/
+ select department, avg(Experience_Years) as avg from sham.performance group by Department;
+ 
+ 
+ select * from sham.employee;
+ 
+ 
+ /* 15.employees who joined after 2020*/
+ select name,Join_Date from sham.employee where Join_Date > "2020-01-01" ;
+ 
+ select * from sham.performance;
+ /* 16.employees working in finance department*/
+ select e.name,P.department from sham.employee e join sham.performance p on e.Emp_ID=p.Emp_ID where department ="Finance";
+ 
+ /* 17. total salary cost for the company*/
+ select sum(salary) as total  from sham.employee ;
+ 
+ 
+ select* from sham.employee;
+ /* 18.employees with bonus greater than 5000*/
+ select name,Bonus from sham.employee where Bonus > 5000;
+ 
+ /* 19.top performing employees with high salary*/
+ select e.name,p.Performance_Rating,e.salary 
+ from sham.employee e 
+join sham.performance p
+ on e.Emp_ID=p.Emp_ID 
+ where p.Performance_Rating >= 4 
+ order by salary desc ;
+ 
+ /* 20.employees earning more than department average salary*/
+ select e.salary,e.name,p.department 
+ from sham.employee e
+ join sham.performance p
+ on e.Emp_ID=p.Emp_ID where e.salary >
+ (select avg(e2.salary) as avg_sal 
+ from sham.employee e2
+ join sham.performance p2 
+ on e2.Emp_ID=p2.Emp_ID where p2.department =p.department );
+ 
+ 
+ select* from sham.employee;
+ select* from sham.performance;
+ /*number of employee joined in each year*/
+ select year(Join_Date)
+ as join_date ,count(*)
+ as total_employee
+ from  sham.employee 
+ group by year(Join_Date) ;
+ 
+ 
+ 
+ 
